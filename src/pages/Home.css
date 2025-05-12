@@ -1,0 +1,33 @@
+.top{
+    height: 100vh;
+}
+.top-inner{
+    padding: 0 3%;
+}
+.top-ttl{
+    text-align: center;
+    padding-top: 20vh;
+    margin-bottom: 10vh;
+    font-size: 3rem;
+    font-weight: bold;
+}
+.top-list{
+    text-align: center;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    font-size: 1.5rem;
+}
+.top-list-ttl a:hover{
+    border-bottom: 1px solid #000;
+}
+
+@media screen and (max-width: 768px) {
+    .top-ttl{
+        font-size: 2rem;
+    }
+    .top-list{
+        font-size: 1.2rem;
+    }
+}
