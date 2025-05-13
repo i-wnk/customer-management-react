@@ -1,3 +1,37 @@
+# 顧客管理システム（React版）
+
+Reactを使って作成した顧客管理システムです。  
+トップページ、顧客一覧、顧客登録、所属会社一覧の4ページで構成されています。
+
+## 使用技術
+
+- React（create-react-app）
+- JavaScript（ES6）
+- CSS（destyle.css / style.css）
+- react-router-dom
+- Git / GitHub
+
+## 機能一覧
+
+- ページ遷移（React Router）
+- 顧客情報の一覧表示（仮データ）
+- 顧客情報の登録フォーム
+- 所属会社の一覧表示
+- GitHubでのバージョン管理
+
+## 今後の実装予定
+
+- APIと連携して会社情報や顧客情報を取得
+- 検索機能の追加（useState＋fetch）
+- モーダルで確認・完了画面を表示
+- 顧客情報の削除・編集処理
+- 登録・削除ボタンの実装
+
+---
+
+
+
+_以下はCreate React Appの自動生成READMEです_
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
