@@ -65,3 +65,58 @@ select {
 /* ------------------------------------------------
 顧客登録ここまで */
   
+
+/* モーダル用 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: none; /* ←初期は非表示 */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-box {
+  background: #fff;
+  border: 15px solid #011658;
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content{
+    margin: 50px 0;
+    font-size: 1.3rem;
+}
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 30px; 
+}
+.modal-btn{
+    border: 2px solid #011658;
+    background-color: #D7DBE4;
+    border-radius: 5px;
+    padding: 15px 20px;
+}
+.modal-btn:hover{
+    background-color: #011658;
+    color: #D7DBE4;
+}
+  
+
+@media screen and (max-width: 768px) {
+      .modal-content{
+          margin: 50px 0;
+          font-size: 1rem;
+      }
+      .modal-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 20px; 
+      }
+}
