@@ -75,6 +75,51 @@ function CompanyList() {
     }, 0);
   };
 
+  // 削除モーダル表示処理
+  const showDeleteCompanyModal = (companyId, companyName) => {
+  document.getElementById("modal-title").textContent = "所属会社削除";
+  document.getElementById("modal-content").innerHTML = `「<strong>${companyName}</strong>」を削除してもよろしいですか？`;
+
+  document.getElementById("modal-buttons").innerHTML = `
+    <button class="modal-btn confirm" id="modal-delete">削除する</button>
+    <button class="modal-btn cancel" onclick="document.getElementById('modal-overlay').style.display='none'">キャンセル</button>
+  `;
+
+  document.getElementById("modal-overlay").style.display = "flex";
+
+  setTimeout(() => {
+    document.getElementById("modal-delete").onclick = () => {
+      fetch(`${API_BASE_URL}/company/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: companyId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            document.getElementById("modal-title").textContent = "削除完了";
+            document.getElementById("modal-content").innerHTML = "所属会社を削除しました。";
+            document.getElementById("modal-buttons").innerHTML = `
+              <button class="modal-btn confirm" onclick="document.getElementById('modal-overlay').style.display='none'">OK</button>
+            `;
+            fetch(`${API_BASE_URL}/companies`)
+              .then((res) => res.json())
+              .then((data) => setCompanies(data));
+          } else {
+            alert("削除に失敗しました：" + data.message);
+          }
+        })
+        .catch((err) => {
+          console.error("削除エラー:", err);
+          alert("通信エラーが発生しました！");
+        });
+    };
+  }, 0);
+};
+
+
   return (
     <>
       <section className="company">
@@ -111,8 +156,11 @@ function CompanyList() {
                     <button className="edit-btn" onClick={() => showEditCompanyModal(company.id, company.name)}>編集</button>
                   </td>
                   <td>
-                    <button className="delete-btn">削除</button>
+                    <button className="delete-btn" onClick={() => showDeleteCompanyModal(company.id, company.name)}>
+                      削除
+                    </button>
                   </td>
+
                 </tr>
               ))}
             </tbody>
