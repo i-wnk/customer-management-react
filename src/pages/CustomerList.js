@@ -1,93 +1,209 @@
-// src/pages/CustomerList.js
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
+import { useNavigate } from "react-router-dom";
 import "./CustomerList.css";
 
 function CustomerList() {
+  const [name, setName] = useState("");
+  const [kana, setKana] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthdayStart, setBirthdayStart] = useState("");
+  const [birthdayEnd, setBirthdayEnd] = useState("");
+  const [companyId, setCompanyId] = useState("");
+  const [companies, setCompanies] = useState([]);
+
+  const [results, setResults] = useState([]);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
+
+  const [sortColumn, setSortColumn] = useState("id");
+  const [sortOrder, setSortOrder] = useState("ASC");
+
+  const navigate = useNavigate();
+
+
+  // 初回：会社一覧取得
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/companies`)
+      .then((res) => res.json())
+      .then((data) => setCompanies(data))
+      .catch((err) => console.error("会社一覧取得エラー:", err));
+  }, []);
+
+  // 検索処理
+  const fetchCustomers = (pageParam = page, sortCol = sortColumn, sortOrd = sortOrder) => {
+    const params = new URLSearchParams();
+    if (name) params.append("name", name);
+    if (kana) params.append("kana", kana);
+    if (gender !== "") params.append("gender", gender);
+    if (birthdayStart) params.append("birthday_start", birthdayStart);
+    if (birthdayEnd) params.append("birthday_end", birthdayEnd);
+    if (companyId) params.append("company_id", companyId);
+
+    params.append("page", pageParam);
+    params.append("per_page", perPage);
+    params.append("sort_column", sortCol);
+    params.append("sort_order", sortOrd);
+
+    fetch(`${API_BASE_URL}/customers?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setResults(data.customers || data); // Laravelの構成に応じて調整
+        setTotal(data.total || data.length || 0);
+        setPage(pageParam);
+        setSortColumn(sortCol);
+        setSortOrder(sortOrd);
+      })
+      .catch((err) => {
+        console.error("検索エラー:", err);
+        alert("検索に失敗しました！");
+      });
+  };
+
+  // フォーム送信
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchCustomers(1); // 新規検索時は1ページ目に
+  };
+
+  // ページ番号表示
+  const renderPagination = () => {
+    const totalPages = Math.ceil(total / perPage);
+    return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+      <button
+        key={p}
+        onClick={() => fetchCustomers(p)}
+        className="page-btn"
+        disabled={p === page}
+      >
+        {p}
+      </button>
+    ));
+  };
+
+  // ソート切り替え
+  const toggleSort = (column) => {
+    const newOrder = sortOrder === "ASC" ? "DESC" : "ASC";
+    fetchCustomers(1, column, newOrder);
+  };
+
   return (
     <>
-    <section className="search">
+      <section className="search">
         <h2 className="search-ttl">顧客検索・一覧</h2>
-        <form className="search-form">
-            <label className="search-form-list">
-                顧客名<input type="text" name="name" id="search-name" placeholder="苗字名前"/>
-            </label>
-            <label className="search-form-list">
-                コキャクメイ<input type="text" name="kana" id="search-kana" placeholder="ミョウジナマエ"/>
-            </label>
-            <label className="search-form-list">
-                性別
-                <select name="gender" id="search-gender">
-                    <option value="">すべて</option>
-                    <option value="m">男</option>
-                    <option value="f">女</option>
-                </select>
-            </label>
-            <label className="search-form-list">
-                生年月日（開始）<input type="date" name="birthday_start" id="search-birthday-start"/>
-            </label>
-            <label className="search-form-list">
-                生年月日（終了）<input type="date" name="birthday_end" id="search-birthday-end"/>
-            </label>
-            
-            <label className="search-form-list" htmlForfor="company">
-                所属会社
-                <select name="company" id="company">
-                    <option value="">会社を選択</option>
-                    {/* JSでここに会社一覧を追加する */}
-                </select>
-            </label>
-            <button class="search-form-btn" type="submit" id="search-btn">検索</button>
-        </form>{/* /.search-form */}
-
-        {/* 表示件数選択 */}
-        <label className="perPage" htmlForfor="perPage">表示件数：
-            <select id="perPage">
-                <option value="10">10件</option>
-                <option value="20">20件</option>
+        <form className="search-form" onSubmit={handleSearch}>
+          <label className="search-form-list">
+            顧客名
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="苗字名前" />
+          </label>
+          <label className="search-form-list">
+            コキャクメイ
+            <input value={kana} onChange={(e) => setKana(e.target.value)} placeholder="ミョウジナマエ" />
+          </label>
+          <label className="search-form-list">
+            性別
+            <select value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="">すべて</option>
+              <option value="m">男</option>
+              <option value="f">女</option>
             </select>
-        </label>{/* /.perPage */}
-        
-    </section>{/* /.search */}
-    
+          </label>
+          <label className="search-form-list">
+            生年月日（開始）
+            <input type="date" value={birthdayStart} onChange={(e) => setBirthdayStart(e.target.value)} />
+          </label>
+          <label className="search-form-list">
+            生年月日（終了）
+            <input type="date" value={birthdayEnd} onChange={(e) => setBirthdayEnd(e.target.value)} />
+          </label>
+          <label className="search-form-list">
+            所属会社
+            <select value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
+              <option value="">会社を選択</option>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className="search-form-btn" type="submit">
+            検索
+          </button>
+        </form>
 
-    <section className="catalogue">
+        <label className="perPage" htmlFor="perPage">
+          表示件数：
+          <select
+            id="perPage"
+            value={perPage}
+            onChange={(e) => {
+              setPerPage(Number(e.target.value));
+              fetchCustomers(1); // 件数変更時は1ページ目から
+            }}
+          >
+            <option value={10}>10件</option>
+            <option value={20}>20件</option>
+          </select>
+        </label>
+      </section>
+
+      <section className="catalogue">
         <table className="catalogue-tabel">
-            <thead className="catalogue-tabel-head">
-                <tr>
-                    <th id="sortById">顧客ID<span id="sortIconId">▲</span></th>
-                    <th>顧客名</th>
-                    <th>コキャクメイ</th>
-                    <th>メールアドレス</th>
-                    <th>電話番号</th>
-                    <th>所属会社</th>
-                    <th>新規登録日時</th>
-                    <th id="sortByUpdatedAt">最終更新日時<span id="sortIconUpdatedAt">▲</span></th>
-                    <th>編集</th>
-                    <th>削除</th>
-                </tr>
-            </thead>{/* /.catalogue-tabel-head */}
-            <tbody className="catalogue-tabel-body" id="customer-table-body">
-                {/* <tr>
-                    <td>0001</td>
-                    <td>苗字名前</td>
-                    <td>ミョウジナマエ</td>
-                    <td>example@example.com</td>
-                    <td>09012345678</td>
-                    <td>〇〇株式会社</td>
-                    <td>2025/04/01</td>
-                    <td>2025/04/09</td>
-                    <td><button class="catalogue-tabel-body-btn edit-btn" data-id="${customer.id}">編集</button></td>
-                    <td><button class="catalogue-tabel-body-btn delete-btn" data-id="顧客ID" data-name="顧客名">削除</button>
-                    </td>
-                  </tr> */}
-            </tbody>{/* /.catalogue-tabel-body */}
-        </table>{/* /.catalogue-tabel */}
+          <thead className="catalogue-tabel-head">
+            <tr>
+              <th id="sortById" onClick={() => toggleSort("id")}>
+                顧客ID
+                <span id="sortIconId">{sortColumn === "id" ? (sortOrder === "ASC" ? "▲" : "▼") : ""}</span>
+              </th>
+              <th>顧客名</th>
+              <th>コキャクメイ</th>
+              <th>メールアドレス</th>
+              <th>電話番号</th>
+              <th>所属会社</th>
+              <th>新規登録日時</th>
+              <th id="sortByUpdatedAt" onClick={() => toggleSort("updated_at")}>
+                最終更新日時
+                <span id="sortIconUpdatedAt">
+                  {sortColumn === "updated_at" ? (sortOrder === "ASC" ? "▲" : "▼") : ""}
+                </span>
+              </th>
+              <th>編集</th>
+              <th>削除</th>
+            </tr>
+          </thead>
+          <tbody className="catalogue-tabel-body">
+            {results.map((cust) => (
+              <tr key={cust.id}>
+                <td>{cust.id}</td>
+                <td>{cust.name}</td>
+                <td>{cust.kana}</td>
+                <td>{cust.email}</td>
+                <td>{cust.tel}</td>
+                <td>{cust.company_name || "未所属"}</td>
+                <td>{cust.created_at}</td>
+                <td>{cust.updated_at}</td>
+                <td>
+                  <button className="catalogue-tabel-body-btn edit-btn" onClick={() => navigate(`/customer-edit/${cust.id}`)}>編集</button>
+                </td>
+                <td>
+                  <button className="catalogue-tabel-body-btn delete-btn">削除</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-        {/* ページャー（ページ番号や次へボタンを入れる場所） */}
-        <div id="pagination" className="pagination"></div>
-        <Link to="/" className="return-btn">トップへ戻る</Link>
-    </section>{/* /.catalogue */}
+        <div id="pagination" className="pagination">
+          {renderPagination()}
+        </div>
 
+        <Link to="/" className="return-btn">
+          トップへ戻る
+        </Link>
+      </section>
     </>
   );
 }
