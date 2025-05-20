@@ -189,7 +189,7 @@ function CustomerList() {
                   <button className="catalogue-tabel-body-btn edit-btn" onClick={() => navigate(`/customer-edit/${cust.id}`)}>編集</button>
                 </td>
                 <td>
-                  <button className="catalogue-tabel-body-btn delete-btn">削除</button>
+                  <button className="catalogue-tabel-body-btn delete-btn" onClick={() => showDeleteCustomerModal(cust.id, cust.name)}>削除</button>
                 </td>
               </tr>
             ))}
@@ -204,8 +204,83 @@ function CustomerList() {
           トップへ戻る
         </Link>
       </section>
+      <div className="modal-overlay" id="modal-overlay" style={{ display: "none" }}>
+        <div className="modal-box">
+          <h3 className="modal-title" id="modal-title">ここにタイトル</h3>
+          <div className="modal-content" id="modal-content"></div>
+          <div className="modal-buttons" id="modal-buttons"></div>
+        </div>
+      </div>
+
     </>
   );
+
+  function showDeleteCustomerModal(customerId, customerName) {
+  document.getElementById("modal-title").textContent = "削除確認";
+  document.getElementById("modal-content").innerHTML = `「<strong>${customerName}</strong>」を削除してもよろしいですか？`;
+
+  const buttons = document.getElementById("modal-buttons");
+  buttons.innerHTML = "";
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "削除する";
+  confirmBtn.className = "modal-btn confirm";
+  confirmBtn.addEventListener("click", () => {
+    deleteCustomer(customerId);
+  });
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "キャンセル";
+  cancelBtn.className = "modal-btn cancel";
+  cancelBtn.addEventListener("click", closeModal);
+
+  buttons.appendChild(confirmBtn);
+  buttons.appendChild(cancelBtn);
+
+  document.getElementById("modal-overlay").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal-overlay").style.display = "none";
+}
+
+
+function deleteCustomer(customerId) {
+  fetch(`${API_BASE_URL}/customer/delete`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: customerId })
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        closeModal();
+        showDeletedCustomerModal(customerId);
+        fetchCustomers(1); // ← 一覧を再取得して更新！
+      } else {
+        alert("削除に失敗：" + result.message);
+      }
+    })
+    .catch((err) => {
+      console.error("削除エラー:", err);
+      alert("通信エラーが発生しました！");
+    });
+}
+
+function showDeletedCustomerModal(name) {
+  document.getElementById("modal-title").textContent = "削除完了";
+  document.getElementById("modal-content").innerHTML = "削除が完了しました。";
+
+  document.getElementById("modal-buttons").innerHTML = `
+    <button class="modal-btn confirm" onclick="document.getElementById('modal-overlay').style.display = 'none'">OK</button>
+  `;
+
+  document.getElementById("modal-overlay").style.display = "flex";
+}
+
+
+
+
 }
 
 export default CustomerList;
