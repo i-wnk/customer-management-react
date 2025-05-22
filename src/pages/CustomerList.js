@@ -96,15 +96,15 @@ function CustomerList() {
         <form className="search-form" onSubmit={handleSearch}>
           <label className="search-form-list">
             顧客名
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="苗字名前" />
+            <input name="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="苗字名前" />
           </label>
           <label className="search-form-list">
             コキャクメイ
-            <input value={kana} onChange={(e) => setKana(e.target.value)} placeholder="ミョウジナマエ" />
+            <input name="kana" value={kana} onChange={(e) => setKana(e.target.value)} placeholder="ミョウジナマエ" />
           </label>
           <label className="search-form-list">
             性別
-            <select value={gender} onChange={(e) => setGender(e.target.value)}>
+            <select name="gender" value={gender} onChange={(e) => setGender(e.target.value)}>
               <option value="">すべて</option>
               <option value="m">男</option>
               <option value="f">女</option>
@@ -112,15 +112,15 @@ function CustomerList() {
           </label>
           <label className="search-form-list">
             生年月日（開始）
-            <input type="date" value={birthdayStart} onChange={(e) => setBirthdayStart(e.target.value)} />
+            <input name="birthday-start" type="date" value={birthdayStart} onChange={(e) => setBirthdayStart(e.target.value)} />
           </label>
           <label className="search-form-list">
             生年月日（終了）
-            <input type="date" value={birthdayEnd} onChange={(e) => setBirthdayEnd(e.target.value)} />
+            <input name="birthday-end" type="date" value={birthdayEnd} onChange={(e) => setBirthdayEnd(e.target.value)} />
           </label>
           <label className="search-form-list">
             所属会社
-            <select value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
+            <select name="company-id" value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
               <option value="">会社を選択</option>
               {companies.map((c) => (
                 <option key={c.id} value={c.id}>

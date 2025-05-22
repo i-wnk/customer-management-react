@@ -166,7 +166,7 @@ function CustomerEdit() {
               ))}
             </select>
           </label>
-          <button className="edit-form-btn" type="submit">
+          <button className="edit-form-btn" id="update-btn" type="submit">
             編集
           </button>
         </form>

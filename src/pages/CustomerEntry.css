@@ -60,11 +60,14 @@ select {
     .entry-form-btn{
         margin: 30px auto 0;
     }
+    .return-btn{
+        margin-bottom: 50px;
+    }
 }
 
 /* ------------------------------------------------
 顧客登録ここまで */
-  
+
 
 /* モーダル用 */
 .modal-overlay {
